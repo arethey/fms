@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 26, 2023 at 09:35 AM
+-- Generation Time: Jan 28, 2023 at 11:38 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -40,7 +40,8 @@ CREATE TABLE `files` (
 --
 
 INSERT INTO `files` (`id`, `file_name`, `type`, `size`, `folder_id`) VALUES
-(9, 'labrador.jpg', 'image/jpeg', '33.26953125', 13);
+(9, 'labrador.jpg', 'image/jpeg', '33.26953125', 13),
+(21, 'corgi.jpg', 'image/jpeg', '8.4970703125', 23);
 
 -- --------------------------------------------------------
 
@@ -50,6 +51,7 @@ INSERT INTO `files` (`id`, `file_name`, `type`, `size`, `folder_id`) VALUES
 
 CREATE TABLE `folders` (
   `id` int(11) NOT NULL,
+  `folder_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
@@ -59,9 +61,11 @@ CREATE TABLE `folders` (
 -- Dumping data for table `folders`
 --
 
-INSERT INTO `folders` (`id`, `user_id`, `name`, `created_at`) VALUES
-(13, 1, 'folder1', '2023-01-24 16:38:08'),
-(14, 1, 'folder2', '2023-01-24 16:39:10');
+INSERT INTO `folders` (`id`, `folder_id`, `user_id`, `name`, `created_at`) VALUES
+(13, 0, 1, 'folder1233', '2023-01-24 16:38:08'),
+(21, 0, 1, 'folder2', '2023-01-28 18:15:08'),
+(23, 13, 1, 'test2', '2023-01-28 18:17:06'),
+(24, 21, 1, 'haha', '2023-01-28 18:17:10');
 
 -- --------------------------------------------------------
 
@@ -82,9 +86,8 @@ CREATE TABLE `subfolders` (
 --
 
 INSERT INTO `subfolders` (`id`, `user_id`, `name`, `folder_id`, `created_at`) VALUES
-(2, 1, 'subfolder1', 13, '2023-01-24 16:38:16'),
-(3, 1, 'subfolder2', 13, '2023-01-24 16:38:43'),
-(4, 1, 'subfolders1', 14, '2023-01-24 16:39:53');
+(4, 1, 'subfolders1', 14, '2023-01-24 16:39:53'),
+(8, 0, 'test', 0, '2023-01-28 18:13:08');
 
 -- --------------------------------------------------------
 
@@ -145,19 +148,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `files`
 --
 ALTER TABLE `files`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `folders`
 --
 ALTER TABLE `folders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `subfolders`
 --
 ALTER TABLE `subfolders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
