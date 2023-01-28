@@ -20,9 +20,24 @@
                     $folder_name = $row["name"];
                     $main_folder_id = $row["folder_id"];
 
-                    // if($row["folder_id"] != 0){
-                    //     echo 'subfolders';
-                    // }
+                    if($row["folder_id"] != 0){
+                        $sql = "SELECT * FROM folders WHERE id = $main_folder_id";
+                        if($result = $mysqli->query($sql)){
+                            if($result->num_rows > 0){
+                                // $main_folder_name = '';
+                                while($row = $result->fetch_array()){
+                                    $main_folder_name = $row["name"];
+                                }
+
+                                // Free result set
+                                $result->free();
+                            } else{
+                                echo 'No records were found.';
+                            }
+                        } else{
+                            echo "Oops! Something went wrong. Please try again later.";
+                        }
+                    }
                 } else{
                     header("location: documents.php");
                     exit();
@@ -47,6 +62,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item"><a href="documents.php">Documents</a></li>
+                <li class="breadcrumb-item"><a href="folder.php?id=<?php echo $main_folder_id; ?>"><?php echo $main_folder_name; ?></a></li>
                 <li class="breadcrumb-item active" aria-current="page"><?php echo $folder_name; ?></li>
             </ol>
         </nav>
