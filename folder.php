@@ -1,31 +1,24 @@
 <?php include 'includes/header.php';?>
 <?php
-    // Check existence of id parameter before processing further
+    require_once "config.php";
+
     if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
-        // Prepare a select statement
         $sql = "SELECT * FROM folders WHERE id = ?";
         
         if($stmt = $mysqli->prepare($sql)){
-            // Bind variables to the prepared statement as parameters
             $stmt->bind_param("i", $param_id);
             
-            // Set parameters
             $param_id = trim($_GET["id"]);
             
-            // Attempt to execute the prepared statement
             if($stmt->execute()){
                 $result = $stmt->get_result();
                 
                 if($result->num_rows == 1){
-                    /* Fetch result row as an associative array. Since the result set
-                    contains only one row, we don't need to use while loop */
                     $row = $result->fetch_array(MYSQLI_ASSOC);
                     
-                    // Retrieve individual field value
                     $folder_id = $row["id"];
                     $folder_name = $row["name"];
                 } else{
-                    // URL doesn't contain valid id parameter. Redirect to error page
                     header("location: documents.php");
                     exit();
                 }
@@ -35,65 +28,38 @@
             }
         }
         
-        // Close statement
         $stmt->close();
         
-        // Close connection
-        // $mysqli->close();
+        //$mysqli->close();
     } else{
-        // URL doesn't contain id parameter. Redirect to error page
         header("location: documents.php");
         exit();
     }
 ?>
 
-
 <div class="container pt-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="documents.php">Documents</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><?php echo $folder_name; ?></li>
-        </ol>
-    </nav>
-
-    <!-- <button type="button" class="btn btn-sm btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#newSubFolderModal">
-        Add Folder
-    </button> -->
-
-    <!-- Modal -->
-    <!-- <div class="modal fade" id="newSubFolderModal" tabindex="-1" aria-labelledby="newSubFolderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="newSubFolderModalLabel">New Folder</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                            <label class="form-label">Folder Name</label>
-                            <input type="text" id="folderName" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>" required >
-                            <span class="invalid-feedback"><?php echo $name_err;?></span>
-                        </div>
-                        <input type="hidden" name="folder_id" value="<?php echo $_GET["id"]; ?>" >
-                    </div>
-                    <div class="modal-footer">
-                        <input type="submit" name="newFolderSubmit" class="btn btn-primary" value="Create">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="documents.php">Documents</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?php echo $folder_name; ?></li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center">
+            <a class="btn btn-sm btn-light" href="edit-folder.php?id=<?php echo $_GET['id']; ?>">Edit</a>
+            <form action="delete-folder.php" method="post" onSubmit="return confirm('Are you sure you want to delete this folder?');">
+                <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>" />
+                <button type="submit" name="deleteFolderSubmit" class="btn btn-sm btn-light">Delete</button>
+            </form>
         </div>
-    </div> -->
-
-    
+    </div>
 
     <div class="bg-white shadow-sm rounded p-3 mb-5">
         <div class="mb-3">
             <form action="upload.php?id=<?php echo $_GET["id"] ?>" method="post" enctype="multipart/form-data">
                 <div class="d-flex align-items-center" style="gap: 1rem;">
                     <input class="form-control" type="file" id="formFile" name="file" required />
-                    <button type="submit" name="upload" class="btn btn-primary">Upload</button>
+                    <button type="submit" name="upload" class="btn btn-sm btn-primary">Upload</button>
                 </div>
             </form>
         </div>
@@ -124,7 +90,6 @@
                                     </td>
                                 </tr>';
                             }
-                            // Free result set
                             $result->free();
                         }
                     } else{
@@ -137,11 +102,15 @@
 
     <div class="bg-white shadow-sm rounded p-3">
         <div>
-            <h4>Sub-folders</h4>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h4 class="mb-0">Sub-folders</h4>
+                <a href="new-folder.php?folder_id=<?php echo $_GET["id"] ?>" class="btn btn-sm btn-primary">New Folder</a>
+            </div>
+            
             <?php
                 if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
                     $id = $_GET["id"];
-                    $sql = "SELECT * FROM subfolders WHERE folder_id = $id";
+                    $sql = "SELECT * FROM folders WHERE folder_id = $id";
                     if($result = $mysqli->query($sql)){
                         if($result->num_rows > 0){
                             echo '<div class="row">';
@@ -158,7 +127,6 @@
                                 </div>';
                             }
                             echo '</div>';
-                            // Free result set
                             $result->free();
                         } else{
                             echo '<div class="alert alert-danger"><em>No records were found.</em></div>';

@@ -26,7 +26,7 @@
                 // Attempt to execute the prepared statement
                 if($stmt->execute()){
                     // Redirect to login page
-                    $redirect = isset($_GET["redirect"]) && !empty($_GET["redirect"]) ? $_GET["redirect"] : "folder.php?id=$id";
+                    $redirect = isset($_POST["folder_id"]) && !empty($_POST["folder_id"]) ? "subfolder.php?id=$id" : "folder.php?id=$id";
                     header("location: $redirect");
                 } else{
                     echo "Oops! Something went wrong. Please try again later.";

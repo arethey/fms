@@ -1,33 +1,29 @@
 <?php include 'includes/header.php';?>
 <?php
-    // Check existence of id parameter before processing further
+    require_once "config.php";
+
     if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
-        // Prepare a select statement
-        $sql = "SELECT *, folders.name AS main_folder_name, folders.id AS main_folder_id FROM subfolders INNER JOIN folders ON subfolders.folder_id = folders.id WHERE subfolders.id = ?";
+        $sql = "SELECT * FROM folders WHERE id = ?";
         
         if($stmt = $mysqli->prepare($sql)){
-            // Bind variables to the prepared statement as parameters
             $stmt->bind_param("i", $param_id);
             
-            // Set parameters
             $param_id = trim($_GET["id"]);
             
-            // Attempt to execute the prepared statement
             if($stmt->execute()){
                 $result = $stmt->get_result();
                 
                 if($result->num_rows == 1){
-                    /* Fetch result row as an associative array. Since the result set
-                    contains only one row, we don't need to use while loop */
                     $row = $result->fetch_array(MYSQLI_ASSOC);
                     
-                    // Retrieve individual field value
                     $folder_id = $row["id"];
                     $folder_name = $row["name"];
-                    $main_folder_name = $row["main_folder_name"];
-                    $main_folder_id = $row["main_folder_id"];
+                    $main_folder_id = $row["folder_id"];
+
+                    // if($row["folder_id"] != 0){
+                    //     echo 'subfolders';
+                    // }
                 } else{
-                    // URL doesn't contain valid id parameter. Redirect to error page
                     header("location: documents.php");
                     exit();
                 }
@@ -37,33 +33,40 @@
             }
         }
         
-        // Close statement
         $stmt->close();
         
-        // Close connection
-        // $mysqli->close();
+        //$mysqli->close();
     } else{
-        // URL doesn't contain id parameter. Redirect to error page
         header("location: documents.php");
         exit();
     }
 ?>
 
 <div class="container pt-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="documents.php">Documents</a></li>
-            <li class="breadcrumb-item"><a href="folder.php?id=<?php echo $main_folder_id; ?>"><?php echo $main_folder_name; ?></a></li>
-            <li class="breadcrumb-item active" aria-current="page"><?php echo $folder_name; ?></li>
-        </ol>
-    </nav>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="documents.php">Documents</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><?php echo $folder_name; ?></li>
+            </ol>
+        </nav>
+        <div class="d-flex align-items-center">
+            <a class="btn btn-sm btn-light" href="edit-folder.php?id=<?php echo $_GET['id']; ?>">Edit</a>
+            <form action="delete-folder.php" method="post" onSubmit="return confirm('Are you sure you want to delete this folder?');">
+                <input type="hidden" name="id" value="<?php echo $_GET['id']; ?>" />
+                <input type="hidden" name="folder_id" value="<?php echo $main_folder_id; ?>" />
+                <button type="submit" name="deleteFolderSubmit" class="btn btn-sm btn-light">Delete</button>
+            </form>
+        </div>
+    </div>
 
     <div class="bg-white shadow-sm rounded p-3 mb-5">
         <div class="mb-3">
-            <form action="upload.php?id=<?php echo $_GET["id"] ?>&redirect=subfolder.php?id=<?php echo $_GET["id"]; ?>" method="post" enctype="multipart/form-data">
+            <form action="upload.php?id=<?php echo $_GET["id"] ?>" method="post" enctype="multipart/form-data">
                 <div class="d-flex align-items-center" style="gap: 1rem;">
                     <input class="form-control" type="file" id="formFile" name="file" required />
-                    <button type="submit" name="upload" class="btn btn-primary">Upload</button>
+                    <input type="hidden" name="folder_id" value="<?php echo $main_folder_id; ?>" />
+                    <button type="submit" name="upload" class="btn btn-sm btn-primary">Upload</button>
                 </div>
             </form>
         </div>
@@ -90,11 +93,10 @@
                                     <td>'.$row["size"].'</td>
                                     <td>
                                         <a class="mr-2" href="download.php?file='.$row["file_name"].'">download</a>
-                                        <a href="delete-file.php?id='.$folder_id.'&file_id='.$row["id"].'&file='.$row["file_name"].'&redirect=subfolder.php?id='.$_GET["id"].'">delete</a>
+                                        <a href="delete-file.php?id='.$folder_id.'&folder_id='.$main_folder_id.'&file_id='.$row["id"].'&file='.$row["file_name"].'">delete</a>
                                     </td>
                                 </tr>';
                             }
-                            // Free result set
                             $result->free();
                         }
                     } else{
@@ -105,3 +107,5 @@
         </table>
     </div>
 </div>
+
+<?php include 'includes/footer.php';?>

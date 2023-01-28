@@ -20,7 +20,7 @@ if(isset($_GET["file_id"]) && !empty($_GET["file_id"])){
             unlink("uploads/".$file);
             // Records deleted successfully. Redirect to landing page
             $id = $_GET["id"];
-            $redirect = isset($_GET["redirect"]) && !empty($_GET["redirect"]) ? $_GET["redirect"] : "folder.php?id=$id";
+            $redirect = isset($_GET["folder_id"]) && !empty($_GET["folder_id"]) ? "subfolder.php?id=$id" : "folder.php?id=$id";
             header("location: $redirect");
             exit();
         } else{
@@ -38,7 +38,8 @@ if(isset($_GET["file_id"]) && !empty($_GET["file_id"])){
     if(empty(trim($_GET["id"]))){
         // URL doesn't contain id parameter. Redirect to error page
         $id = $_GET["id"];
-        header("location: folder.php?id=$id");
+        $redirect = isset($_GET["folder_id"]) && !empty($_GET["folder_id"]) ? "subfolder.php?id=$id" : "folder.php?id=$id";
+        header("location: $redirect");
         exit();
     }
 }

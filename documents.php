@@ -8,7 +8,9 @@
 
     <div class="bg-white shadow-sm rounded p-3">
     <?php
-        $sql = "SELECT * FROM folders";
+        require_once "config.php";
+
+        $sql = "SELECT * FROM folders WHERE folder_id = 0";
         if($result = $mysqli->query($sql)){
             if($result->num_rows > 0){
                 echo '<div class="row">';
