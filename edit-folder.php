@@ -8,8 +8,8 @@ $name_err = "";
 
 if(isset($_POST["id"]) && !empty($_POST["id"])){
     $id = $_POST["id"];
-    $tblname = $_POST["tblname"];
-    $redirect = $_POST["redirect"];
+    $folder_id = $_POST["folder_id"];
+    $redirect = $folder_id == "0" ? "folder.php?id=$id" : "subfolder.php?id=$id";
     
     $input_name = trim($_POST["name"]);
     if(empty($input_name)){
@@ -19,7 +19,7 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
     }
     
     if(empty($name_err)){
-        $sql = "UPDATE $tblname SET name=? WHERE id=?";
+        $sql = "UPDATE folders SET name=? WHERE id=?";
  
         if($stmt = $mysqli->prepare($sql)){
             $stmt->bind_param("si", $param_name, $param_id);
@@ -42,12 +42,8 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
 } else{
     if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
         $id =  trim($_GET["id"]);
-
-        $folder_id = isset($_GET["folder_id"]) && !empty(trim($_GET["folder_id"])) ? $_GET["folder_id"] : '';
-        $tblname = empty($folder_id) ? "folders" : "subfolders";
-        $redirect = empty($folder_id) ? "folder.php?id=$id" : "subfolders.php?id=$folder_id";
         
-        $sql = "SELECT * FROM $tblname WHERE id = ?";
+        $sql = "SELECT * FROM folders WHERE id = ?";
         if($stmt = $mysqli->prepare($sql)){
             $stmt->bind_param("i", $param_id);
             $param_id = $id;
@@ -58,6 +54,7 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
                 if($result->num_rows == 1){
                     $row = $result->fetch_array(MYSQLI_ASSOC);
                     $name = $row["name"];
+                    $folder_id = $row["folder_id"];
                 } else{
                     header("location: $redirect");
                     exit();
@@ -88,9 +85,7 @@ if(isset($_POST["id"]) && !empty($_POST["id"])){
             
             <input type="hidden" name="id" value="<?php echo $id; ?>"/>
             <input type="hidden" name="folder_id" value="<?php echo $folder_id; ?>"/>
-            <input type="hidden" name="tblname" value="<?php echo $tblname; ?>"/>
-            <input type="hidden" name="redirect" value="<?php echo $redirect; ?>"/>
-            <a href="<?php echo $redirect; ?>" class="btn btn-sm btn-light">Cancel</a>
+            <a href="<?php echo $folder_id == 0 ? "folder.php?id=$id" : "subfolder.php?id=$id"; ?>" class="btn btn-sm btn-light">Cancel</a>
             <button type="submit" class="btn btn-sm btn-primary">Update</button>
         </form>
     </div>

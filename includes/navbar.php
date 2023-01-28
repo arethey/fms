@@ -16,7 +16,7 @@
                 require_once "config.php";
 
                 $id = $_SESSION["id"];
-                $sql = "SELECT * FROM folders WHERE user_id = $id";
+                $sql = "SELECT * FROM folders WHERE user_id = $id AND folder_id = 0";
                 if($result = $mysqli->query($sql)){
                     if($result->num_rows > 0){
                         while($row = $result->fetch_array()){
